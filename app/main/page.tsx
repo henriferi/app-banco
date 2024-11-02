@@ -1,7 +1,20 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Typography, Button, Snackbar, TextField, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
+import {
+  Typography,
+  Button,
+  Snackbar,
+  TextField,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Box,
+  Paper,
+  Container,
+} from '@mui/material';
 import MuiAlert, { AlertProps } from '@mui/material/Alert';
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(props, ref) {
@@ -16,12 +29,10 @@ const MainPage: React.FC = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
   const [balance, setBalance] = useState<number>(0);
   const [openLogoutModal, setOpenLogoutModal] = useState<boolean>(false);
-
   const [depositAmount, setDepositAmount] = useState<string>('');
   const [withdrawAmount, setWithdrawAmount] = useState<string>('');
   const [transferAmount, setTransferAmount] = useState<string>('');
   const [recipientEmail, setRecipientEmail] = useState<string>('');
-
   const [transactions, setTransactions] = useState<{ type: string; amount: number; recipient?: string }[]>([]);
 
   useEffect(() => {
@@ -138,30 +149,31 @@ const MainPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen p-6 mt-10">
+    <Container maxWidth="sm" sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh' }}>
       {isAuthenticated && user ? (
-        <div className="w-full max-w-md bg-white p-3 rounded-lg shadow-md"> 
-          <Typography variant="h5" className="text-center mb-3">Bem-vindo(a), {user.name}</Typography> 
+        <Paper sx={{ width: '100%', p: 3 }}>
+          <Typography variant="h5" align="center" gutterBottom>
+            Bem-vindo(a), {user.name}
+          </Typography>
 
-          <div className="bg-green-500 p-3 rounded-lg mb-3">
-            <Typography variant="h6" className="text-center text-white">
-              Saldo: R${balance.toFixed(2)}
-            </Typography>
-          </div>
+          <Box bgcolor="success.main" color="white" p={2} borderRadius={1} mb={3} textAlign="center">
+            <Typography variant="h6">Saldo: R${balance.toFixed(2)}</Typography>
+          </Box>
 
-          <Typography variant="h6" className="text-center mb-2">Opções:</Typography>
+          <Typography variant="h6" align="center" gutterBottom>
+            Opções:
+          </Typography>
 
-          <div className="flex flex-col">
+          <Box display="flex" flexDirection="column" gap={1}>
             <TextField
               label="Valor do Depósito"
               variant="outlined"
               value={depositAmount}
               onChange={(e) => setDepositAmount(e.target.value)}
-              className="my-1"
               type="number"
               inputProps={{ min: 0 }}
             />
-            <Button variant="contained" color="primary" className="my-1" onClick={handleDeposit}>
+            <Button variant="contained" color="primary" onClick={handleDeposit}>
               Fazer Depósito
             </Button>
 
@@ -170,11 +182,10 @@ const MainPage: React.FC = () => {
               variant="outlined"
               value={withdrawAmount}
               onChange={(e) => setWithdrawAmount(e.target.value)}
-              className="my-1"
               type="number"
               inputProps={{ min: 0 }}
             />
-            <Button variant="contained" color="primary" className="my-1" onClick={handleWithdraw}>
+            <Button variant="contained" color="primary" onClick={handleWithdraw}>
               Realizar Saque
             </Button>
 
@@ -183,7 +194,6 @@ const MainPage: React.FC = () => {
               variant="outlined"
               value={transferAmount}
               onChange={(e) => setTransferAmount(e.target.value)}
-              className="my-1"
               type="number"
               inputProps={{ min: 0 }}
             />
@@ -192,67 +202,61 @@ const MainPage: React.FC = () => {
               variant="outlined"
               value={recipientEmail}
               onChange={(e) => setRecipientEmail(e.target.value)}
-              className="my-1" 
             />
-            <Button variant="contained" color="primary" className="my-1" onClick={handleTransfer}>
+            <Button variant="contained" color="primary" onClick={handleTransfer}>
               Fazer Transferência
             </Button>
-          </div>
+          </Box>
 
-          <Typography variant="h6" className="mt-4 text-center">Extrato:</Typography>
-          <div className="overflow-auto max-h-16 border border-gray-300 rounded-lg p-2"> 
-            <ul className="w-full mt-2 text-center">
+          <Typography variant="h6" align="center" mt={4}>
+            Extrato:
+          </Typography>
+          <Box overflow="auto" maxHeight="70px" border={1} borderColor="grey.300" borderRadius={1}>
+            <ul style={{ listStyle: 'none', padding: 0, textAlign: 'center' }}>
               {transactions.map((transaction, index) => (
-                <li key={index} className={transaction.type === 'depósito' ? 'text-green-600' : 'text-red-600'}>
+                <li key={index} style={{ color: transaction.type === 'depósito' ? 'green' : 'red' }}>
                   {`${transaction.type}: R$${transaction.amount.toFixed(2)}${transaction.recipient ? ` (para ${transaction.recipient})` : ''}`}
                 </li>
               ))}
             </ul>
-          </div>
+          </Box>
 
-          <div className='flex flex-col gap-10'>
-            <Button variant="contained" color="primary" className="mt-4 mb-2" onClick={handleClearTransactions}>
+          <Box mt={4}>
+            <Button variant="contained" color="primary" fullWidth onClick={handleClearTransactions}>
               Limpar Extrato
             </Button>
 
-            <Button className="mt-2 bg-red-600 text-white hover:bg-red-700" onClick={handleOpenLogoutModal}>
+            <Button variant="contained" color="error" fullWidth sx={{ mt: 2 }} onClick={handleOpenLogoutModal}>
               Sair
             </Button>
+          </Box>
 
-            <Dialog open={openLogoutModal} onClose={handleCloseLogoutModal}>
-              <DialogTitle>Confirmação</DialogTitle>
-              <DialogContent>
-                <DialogContentText>
-                  Você tem certeza que deseja sair?
-                </DialogContentText>
-              </DialogContent>
-              <DialogActions>
-                <Button onClick={handleCloseLogoutModal} color="primary">
-                  Cancelar
-                </Button>
-                <Button onClick={handleConfirmLogout} color="primary">
-                  Sair
-                </Button>
-              </DialogActions>
-            </Dialog>
-          </div>
-        </div>
+          <Dialog open={openLogoutModal} onClose={handleCloseLogoutModal}>
+            <DialogTitle>Confirmação</DialogTitle>
+            <DialogContent>
+              <DialogContentText>Você tem certeza que deseja sair?</DialogContentText>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleCloseLogoutModal} color="primary">
+                Cancelar
+              </Button>
+              <Button onClick={handleConfirmLogout} color="error">
+                Confirmar
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+          <Snackbar open={snackbarOpen} autoHideDuration={3000} onClose={() => setSnackbarOpen(false)}>
+            <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
+              {snackbarMessage}
+            </Alert>
+          </Snackbar>
+        </Paper>
       ) : (
-        <Typography variant="h5">Carregando...</Typography>
+        <Typography>Carregando...</Typography>
       )}
-
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={() => setSnackbarOpen(false)}>
-        <Alert onClose={() => setSnackbarOpen(false)} severity={snackbarSeverity}>
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
-    </div>
+    </Container>
   );
 };
 
 export default MainPage;
-
-
-
-
-
