@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { TextField, Button, Typography, Alert, Modal } from '@mui/material';
+import { TextField, Button, Typography, Alert, Modal, Box, Container } from '@mui/material';
 import bcrypt from 'bcryptjs';
 
 const LoginPage: React.FC = () => {
@@ -11,7 +11,7 @@ const LoginPage: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [isRegistering, setIsRegistering] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  const [modalOpen, setModalOpen] = useState<boolean>(false); 
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -22,9 +22,9 @@ const LoginPage: React.FC = () => {
     const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
 
     if (storedUser.email === email && bcrypt.compareSync(password, storedUser.password)) {
-      const token = 'teste-token'; // Você pode gerar um token real aqui
+      const token = 'teste-token';
       localStorage.setItem('token', token);
-      window.location.href = '/main'; 
+      window.location.href = '/main';
     } else {
       setError('Email ou senha inválidos!');
     }
@@ -45,8 +45,8 @@ const LoginPage: React.FC = () => {
     const user = { name, email, password: hashedPassword };
     localStorage.setItem('user', JSON.stringify(user));
     setModalOpen(true);
-    resetForm(); 
-    setError(''); 
+    resetForm();
+    setError('');
   };
 
   const resetForm = () => {
@@ -59,27 +59,27 @@ const LoginPage: React.FC = () => {
   const handleCloseModal = () => {
     setModalOpen(false);
     setIsRegistering(false);
-    setEmail(email); 
-    setPassword(password); 
+    setEmail(email);
+    setPassword(password);
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-zinc-100">
-      <Typography variant="h3" className="mb-4">Seu banco digital</Typography>
-      {error && <Alert severity="error">{error}</Alert>}
-      
-      <fieldset className="border-2 border-gray-300 rounded p-4 w-full max-w-md">
-        <legend className="text-2xl font-semibold">{isRegistering ? 'Cadastro' : 'Login'}</legend>
-        
+    <Container maxWidth={false} sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', bgcolor: 'grey.100' }}>
+      <Typography variant="h3" sx={{ mb: 4 }}>Banco Digital</Typography>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+
+      <Box component="fieldset" sx={{ border: '2px solid', borderColor: 'grey.300', borderRadius: 1, p: 3, width: '100%', maxWidth: 400 }}>
+        <Typography variant="h5" component="legend" sx={{ fontWeight: 'bold', mb: 2 }}>{isRegistering ? 'Cadastro' : 'Login'}</Typography>
+
         {isRegistering && (
           <TextField
             label="Nome"
             variant="outlined"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="my-2"
             required
             fullWidth
+            sx={{ mb: 2 }}
           />
         )}
         <TextField
@@ -87,9 +87,9 @@ const LoginPage: React.FC = () => {
           variant="outlined"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="my-2"
           required
           fullWidth
+          sx={{ mb: 2 }}
         />
         <TextField
           label="Senha"
@@ -97,9 +97,9 @@ const LoginPage: React.FC = () => {
           variant="outlined"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="my-2"
           required
           fullWidth
+          sx={{ mb: 2 }}
         />
         {isRegistering && (
           <TextField
@@ -108,18 +108,18 @@ const LoginPage: React.FC = () => {
             variant="outlined"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="my-2"
             required
             fullWidth
+            sx={{ mb: 2 }}
           />
         )}
-        <Button variant="contained" color="primary" onClick={isRegistering ? handleRegister : handleLogin} className="w-full">
+        <Button variant="contained" color="primary" onClick={isRegistering ? handleRegister : handleLogin} fullWidth sx={{ mb: 2 }}>
           {isRegistering ? 'Cadastrar' : 'Entrar'}
         </Button>
-        <Button onClick={() => setIsRegistering(!isRegistering)} className="w-full">
+        <Button onClick={() => setIsRegistering(!isRegistering)} fullWidth>
           {isRegistering ? 'Já tem uma conta? Faça login' : 'Não tem conta? Crie uma'}
         </Button>
-      </fieldset>
+      </Box>
 
       <Modal
         open={modalOpen}
@@ -127,14 +127,14 @@ const LoginPage: React.FC = () => {
         aria-labelledby="simple-modal-title"
         aria-describedby="simple-modal-description"
       >
-        <div className="flex flex-col items-center justify-center h-screen bg-white p-4 rounded shadow-lg">
-          <Typography variant="h6" className="mb-4">Cadastro realizado com sucesso!</Typography>
+        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', bgcolor: 'background.paper', p: 4, borderRadius: 1, boxShadow: 3 }}>
+          <Typography variant="h6" sx={{ mb: 2 }}>Cadastro realizado com sucesso!</Typography>
           <Button variant="contained" onClick={handleCloseModal}>
             Fechar
           </Button>
-        </div>
+        </Box>
       </Modal>
-    </div>
+    </Container>
   );
 };
 
